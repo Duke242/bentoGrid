@@ -4,6 +4,7 @@ import ColorPicker from "react-best-gradient-color-picker"
 import { Rnd } from "react-rnd"
 import { TiDelete } from "react-icons/ti"
 import { IoAddCircleOutline } from "react-icons/io5"
+import html2canvas from "html2canvas-pro"
 
 const BentoGrid = () => {
   const defaultTile = {
@@ -27,6 +28,15 @@ const BentoGrid = () => {
     borderRadius: "12px",
     overflow: "hidden",
     backgroundColor: "lightgray",
+  }
+
+  const downloadImage = () => {
+    html2canvas(gridRef.current).then((canvas) => {
+      const link = document.createElement("a")
+      link.href = canvas.toDataURL("image/png")
+      link.download = "bento-grid.png"
+      link.click()
+    })
   }
 
   const shadowSizeMapping = {
@@ -231,6 +241,12 @@ const BentoGrid = () => {
       </div>
       {/* Properties panel */}
       <div className="mr-2 p-6 rounded-2xl text-black shadow w-3/12 h-auto overflow-scroll max-h-[75vh] bg-[#F5F6F6] shadow-2xl">
+        <button
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mt-4"
+          onClick={downloadImage}
+        >
+          Download Image
+        </button>
         <h2 className="text-center mb-4 text-lg font-semibold">Properties</h2>
         {backgroundSelected === false && selectedTile === null ? (
           <div className="text-blue-400">Properties will show up here</div>
@@ -493,6 +509,7 @@ const BentoGrid = () => {
               boxShadow: tile.boxShadow,
               alignItems: tile.alignItems,
               background: tile.backgroundColor,
+              color: tile.color,
             }}
             default={{
               x: 100,

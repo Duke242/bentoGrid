@@ -19,6 +19,8 @@
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.19",
     "form-data": "^4.0.0",
+    "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^1.4.3",
     "mailgun.js": "^9.4.1",
     "next": "^14.1.4",
     "next-plausible": "^3.12.0",
