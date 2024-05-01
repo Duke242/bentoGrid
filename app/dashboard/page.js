@@ -13,23 +13,24 @@ export const dynamic = "force-dynamic"
 // See https://shipfa.st/docs/tutorials/private-page
 export default async function Dashboard() {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    // const supabase = createServerComponentClient({ cookies })
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
 
-    const { data: profiles, error } = await supabase
-      .from("profiles")
-      .select("has_access")
-      .eq("id", session.user.id)
+    // const { data: profiles, error } = await supabase
+    //   .from("profiles")
+    //   .select("has_access")
+    //   .eq("id", session.user.id)
 
-    if (error) {
-      throw new Error(error.message)
-    }
+    // if (error) {
+    //   throw new Error(error.message)
+    // }
 
-    const userAccess = profiles[0].has_access
-    console.log({ userAccess })
+    // const userAccess = profiles[0].has_access
+    // console.log({ userAccess })
+    const userAccess = true
 
     if (userAccess) {
       return (
