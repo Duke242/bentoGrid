@@ -7,6 +7,14 @@ import { IoAddCircleOutline } from "react-icons/io5"
 import html2canvas from "html2canvas-pro"
 
 const BentoGrid = () => {
+  const [color, setColor] = useState("#f9f9f9")
+  const [tiles, setTiles] = useState([])
+  const [selectedTile, setSelectedTile] = useState(null)
+  const [backgroundSelected, setBackgroundSelected] = useState(false)
+  const [selectedColor, setSelectedColor] = useState("#ffffff")
+  const [textColor, setTextColor] = useState("#000000")
+  const gridRef = useRef(null)
+
   const defaultTile = {
     title: "New",
     width: 200,
@@ -31,12 +39,22 @@ const BentoGrid = () => {
   }
 
   const downloadImage = () => {
-    html2canvas(gridRef.current).then((canvas) => {
-      const link = document.createElement("a")
-      link.href = canvas.toDataURL("image/png")
-      link.download = "bento-grid.png"
-      link.click()
-    })
+    setSelectedTile(null)
+
+    // Introduce a delay before capturing the image
+    setTimeout(() => {
+      const gridElement = gridRef.current
+      html2canvas(gridElement, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 1,
+      }).then((canvas) => {
+        const link = document.createElement("a")
+        link.href = canvas.toDataURL("image/png")
+        link.download = "bento-grid.png"
+        link.click()
+      })
+    }, 100) // Delay of 100 milliseconds (adjust as needed)
   }
 
   const shadowSizeMapping = {
@@ -49,16 +67,6 @@ const BentoGrid = () => {
       "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
     "shadow-2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
   }
-
-  const [color, setColor] = useState("#f9f9f9")
-  const [tiles, setTiles] = useState([])
-  const [selectedTile, setSelectedTile] = useState(null)
-  const [backgroundSelected, setBackgroundSelected] = useState(false)
-  const [selectedColor, setSelectedColor] = useState("#ffffff")
-  const [textColor, setTextColor] = useState("#000000") // State to store text color
-  // const [image, takeScreenshot] = useReactScreenshot()
-
-  const gridRef = useRef(null)
 
   const handleClick = (id) => {
     if (selectedTile === id) {
@@ -119,7 +127,8 @@ const BentoGrid = () => {
 
   const handleTextColorChange = (color) => {
     setTextColor(color)
-    handlePropertyChange(selectedTile, "color", color) // Update text color in properties
+    handlePropertyChange(selectedTile, "color", color)
+    console.log("Text Color:", color)
   }
 
   const handlePropertyChange = (id, property, value) => {
@@ -454,7 +463,6 @@ const BentoGrid = () => {
               <ColorPicker
                 hidePresets={true}
                 hideInputs={true}
-                hideColorTypeBtns={true}
                 value={textColor}
                 onChange={handleTextColorChange}
               />
@@ -490,7 +498,7 @@ const BentoGrid = () => {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
           gap: "10px",
-          borderRadius: "12px",
+          // borderRadius: "12px",
           padding: "20px",
           overflow: "auto",
         }}
@@ -519,22 +527,30 @@ const BentoGrid = () => {
             }}
             onClick={() => handleTileClick(tile.id)}
           >
-            {/* <textarea
+            <textarea
               value={tile.title}
               onChange={(e) => handleTitleChange(tile.id, e)}
               className="outline-none"
               style={{
                 border: "none",
                 width: "100%",
-                resize: "none", // Prevent resizing
+                resize: "none",
                 textAlign: tile.textAlign,
-                alignSelf: "center",
-                color: tile.color,
-                background: "none",
+                ...(tile.color.includes("linear-gradient")
+                  ? {
+                      backgroundImage: tile.color,
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      color: "transparent",
+                    }
+                  : {
+                      color: tile.color,
+                      backgroundColor: "transparent",
+                    }),
                 fontWeight: tile.fontWeight,
               }}
-            /> */}
-            Title
+            />
           </Rnd>
         ))}
       </div>
