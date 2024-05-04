@@ -4,11 +4,10 @@ import ColorPicker from "react-best-gradient-color-picker"
 import { Rnd } from "react-rnd"
 import { TiDelete } from "react-icons/ti"
 import { IoAddCircleOutline } from "react-icons/io5"
-import html2canvas from "html2canvas-pro"
+import { toPng } from "html-to-image"
 
 const BentoGrid = () => {
   const [color, setColor] = useState("#f9f9f9")
-  const [tiles, setTiles] = useState([])
   const [selectedTile, setSelectedTile] = useState(null)
   const [backgroundSelected, setBackgroundSelected] = useState(false)
   const [selectedColor, setSelectedColor] = useState("#ffffff")
@@ -16,18 +15,22 @@ const BentoGrid = () => {
   const gridRef = useRef(null)
 
   const defaultTile = {
+    id: Date.now(),
     title: "New",
     width: 200,
     height: 100,
     fontSize: 16,
     fontFamily: "Geneva",
     textAlign: "center",
-    boxShadow: "shadow-md",
+    dropShadow: "drop-shadow-md",
     fontWeight: "normal", // Add font weight property with default value
-    alignItems: "flex-start",
+    alignItems: "center",
     backgroundColor: "#c3ebfa",
     color: "black", // Add text color property with default color
+    borderRadius: 12, // Add borderRadius property with default value
+    fontStyle: "normal", // Add fontStyle property with default value
   }
+  const [tiles, setTiles] = useState([defaultTile])
 
   const style = {
     display: "flex",
@@ -38,34 +41,32 @@ const BentoGrid = () => {
     backgroundColor: "lightgray",
   }
 
-  const downloadImage = () => {
+  const downloadImage = async () => {
     setSelectedTile(null)
 
-    // Introduce a delay before capturing the image
-    setTimeout(() => {
-      const gridElement = gridRef.current
-      html2canvas(gridElement, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 1,
-      }).then((canvas) => {
+    const gridElement = gridRef.current
+
+    toPng(gridElement, { cacheBust: true })
+      .then((dataUrl) => {
         const link = document.createElement("a")
-        link.href = canvas.toDataURL("image/png")
-        link.download = "bento-grid.png"
+        link.download = "my-image-name.png"
+        link.href = dataUrl
         link.click()
       })
-    }, 100) // Delay of 100 milliseconds (adjust as needed)
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   const shadowSizeMapping = {
-    "shadow-sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-    "shadow-md":
-      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-    "shadow-lg":
-      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
-    "shadow-xl":
-      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-    "shadow-2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+    "drop-shadow-sm": "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05))",
+    "drop-shadow-md":
+      "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06))",
+    "drop-shadow-lg":
+      "drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05))",
+    "drop-shadow-xl":
+      "drop-shadow(0 20px 25px rgba(0, 0, 0, 0.1)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.04))",
+    "drop-shadow-2xl": "drop-shadow(0 25px 50px rgba(0, 0, 0, 0.25))",
   }
 
   const handleClick = (id) => {
@@ -104,17 +105,17 @@ const BentoGrid = () => {
     }
   }
 
-  const getShadowIntensityKey = (boxShadowValue) => {
+  const getShadowIntensityKey = (dropShadowValue) => {
     for (const key in shadowSizeMapping) {
-      if (shadowSizeMapping[key] === boxShadowValue) {
+      if (shadowSizeMapping[key] === dropShadowValue) {
         return key
       }
     }
-    return "" // Return empty string if no matching key is found
+    return "none"
   }
 
   const addTitle = () => {
-    setTiles([...tiles, { id: Date.now(), ...defaultTile }])
+    setTiles([...tiles, { ...defaultTile }])
   }
 
   const handleTitleChange = (id, event) => {
@@ -139,16 +140,18 @@ const BentoGrid = () => {
     if (
       property === "backgroundColor" ||
       property === "color" ||
-      property === "fontWeight"
+      property === "fontWeight" ||
+      property === "fontStyle" ||
+      property === "borderRadius"
     ) {
       const updatedTiles = newTiles.map((tile) =>
         tile.id === id ? { ...tile, [property]: value } : tile
       )
       setTiles(updatedTiles)
-    } else if (property === "boxShadow") {
-      const boxShadow = shadowSizeMapping[value]
+    } else if (property === "dropShadow") {
+      const dropShadow = shadowSizeMapping[value]
       const updatedTiles = newTiles.map((tile) =>
-        tile.id === id ? { ...tile, boxShadow: boxShadow } : tile
+        tile.id === id ? { ...tile, dropShadow: dropShadow } : tile
       )
       setTiles(updatedTiles)
     } else {
@@ -182,76 +185,92 @@ const BentoGrid = () => {
 
   const shadowIntensityOptions = [
     { label: "None", value: "none" },
-    { label: "Small", value: "shadow-sm" },
-    { label: "Medium", value: "shadow-md" },
-    { label: "Large", value: "shadow-lg" },
-    { label: "Extra Large", value: "shadow-xl" },
-    { label: "2x Large", value: "shadow-2xl" },
+    { label: "Small", value: "drop-shadow-sm" },
+    { label: "Medium", value: "drop-shadow-md" },
+    { label: "Large", value: "drop-shadow-lg" },
+    { label: "Extra Large", value: "drop-shadow-xl" },
+    { label: "2x Large", value: "drop-shadow-2xl" },
   ]
 
   return (
-    <div className="flex items-start h-fit bg-[#dbf3fc] p-6 text-blue-500 shadow-2xl rounded">
-      {/* Sidebar */}
-      <div className="mr-2 bg-[#F5F6F6] rounded-2xl shadow-2xl w-36">
-        <button
-          className={`text-left text-lg pb-2 py-2 rounded-t-2xl px-6 text-md w-full hover:scale-110 transition duration-300 ${
-            backgroundSelected ? "bg-gray-300" : ""
-          }`}
-          onClick={backgroundSelectedFunc}
-          // style={{ borderBottom: "1px solid lightgray" }}
-        >
-          Background
-        </button>
-        <div>
-          {/* Tile buttons */}
-          {tiles.map((tile) => (
-            <div key={tile.id} className="relative ">
-              <button
-                className={`flex line-clamp-1 text-left pb-2 py-2 px-6 hover:scale-110 text-md w-full hover:bg-blue-200 hover:rounded transition ${
-                  selectedTile === tile.id ? "bg-gray-300" : ""
-                }`}
-                onClick={() => handleClick(tile.id)}
-                style={{
-                  borderBottom: "1px solid #D1D5DB",
-                  borderTop: "1px solid #D1D5DB",
-                  textAlign: "center",
-                }}
-              >
-                {tile.title ? (
-                  tile.title.length > 8 ? (
-                    tile.title.slice(0, 8) + "..."
-                  ) : (
-                    tile.title
-                  )
-                ) : (
-                  <i>No Name</i>
-                )}
-              </button>
-              {selectedTile === tile.id && (
-                <button
-                  className="absolute top-1 right-0 mt-1 mr-1 transition-transform duration-300 transform hover:scale-110"
-                  onClick={() => deleteTile(tile.id)}
-                >
-                  <TiDelete size={25} color="red" />
-                </button>
-              )}
-            </div>
-          ))}
-          {/* Add tile button */}
-          <button
-            className="flex items-center justify-center py-2 px-6 text-md w-full hover:rounded transition transform hover:scale-110"
-            onClick={addTitle}
+    <div className="flex items-start h-fit bg-[#dbf3fc] h-screen bg-gray-50 text-blue-500 shadow-2xl rounded">
+      <div
+        ref={gridRef}
+        style={{
+          background: color,
+          width: "auto", // Change from fixed width to auto
+          height: "auto", // Change from fixed height to auto
+          display: "grid",
+          gap: "10px",
+          // borderRadius: "12px",
+          padding: "20px",
+          overflow: "hidden",
+          position: "relative",
+          resize: "both", // Allow resizing in both directions
+          minWidth: "60vw", // Set a minimum width to prevent too small resizing
+          minHeight: "60vh", // Set a minimum height to prevent too small resizing
+          maxWidth: "75vw", // Set a maximum width to prevent too large resizing
+          maxHeight: "100vh", // Set a maximum height to prevent too large resizing
+        }}
+        className="border border-gray-300 mr-4 drop-shadow-2xl"
+      >
+        {tiles.map((tile) => (
+          <Rnd
+            bounds={"parent"}
+            key={tile.id}
+            style={{
+              ...style,
+              fontSize: tile.fontSize,
+              fontFamily: tile.fontFamily,
+              textAlign: tile.textAlign,
+              border: selectedTile === tile.id ? "1px solid blue" : "none",
+              filter: tile.dropShadow,
+              // alignItems: tile.alignItems,
+              background: tile.backgroundColor,
+              color: tile.color,
+              borderRadius: `${tile.borderRadius}px`, // Use the borderRadius property from the tile
+            }}
+            default={{
+              x: 0,
+              y: 0,
+              width: tile.width,
+              height: tile.height,
+            }}
+            onClick={() => handleTileClick(tile.id)}
           >
-            <span>
-              <IoAddCircleOutline size={25} color="#40C1EF" />
-            </span>
-          </button>
-        </div>
+            <textarea
+              value={tile.title}
+              onChange={(e) => handleTitleChange(tile.id, e)}
+              className="outline-none select-none no-scrollbar"
+              style={{
+                border: "none",
+                width: "100%",
+                resize: "none",
+                textAlign: tile.textAlign,
+                ...(tile.color.includes("gradient")
+                  ? {
+                      backgroundImage: tile.color,
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      color: "transparent",
+                    }
+                  : {
+                      color: tile.color,
+                      backgroundColor: "transparent",
+                    }),
+                fontWeight: tile.fontWeight,
+                alignSelf: tile.alignItems, // Add this line
+                fontStyle: tile.fontStyle, // Apply font style (italics)
+              }}
+            />
+          </Rnd>
+        ))}
       </div>
-      {/* Properties panel */}
-      <div className="mr-2 p-6 rounded-2xl text-black shadow w-3/12 h-auto overflow-scroll max-h-[75vh] bg-[#F5F6F6] shadow-2xl">
+
+      <div className="mr-2 p-6 rounded-2xl no-scrollbar text-black shadow w-4/12 h-auto overflow-scroll max-h-[75vh] bg-[#F5F6F6] border border-gray-300 shadow-2xl shadow-blue-300 scrollbar-thin">
         <button
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 mt-4"
+          className="w-full bg-blue-400 text-white py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-600 hover:scale-105 hover:text-shadow-lg focus:outline-none focus:bg-blue-600 mb-4 mt-4"
           onClick={downloadImage}
         >
           Download Image
@@ -275,7 +294,6 @@ const BentoGrid = () => {
                 <span className="text-sm ml-2">
                   {tiles.find((tile) => tile.id === selectedTile)?.fontSize ||
                     0}
-                  px
                 </span>
               </label>
               <input
@@ -296,7 +314,7 @@ const BentoGrid = () => {
                 className="w-full"
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-4 flex gap-4">
               {/* Font weight checkbox */}
               <label htmlFor="fontWeight" className="block mb-1">
                 <input
@@ -317,6 +335,52 @@ const BentoGrid = () => {
                 />
                 Bold
               </label>
+              <label htmlFor="fontStyle">
+                <input
+                  type="checkbox"
+                  id="fontStyle"
+                  checked={
+                    tiles.find((tile) => tile.id === selectedTile)
+                      ?.fontStyle === "italic"
+                  }
+                  onChange={(e) =>
+                    handlePropertyChange(
+                      selectedTile,
+                      "fontStyle",
+                      e.target.checked ? "italic" : "normal"
+                    )
+                  }
+                  className="mr-2"
+                />
+                Italics
+              </label>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="borderRadius" className="block mb-1">
+                Border Radius:
+                <span className="text-sm ml-2">
+                  {tiles.find((tile) => tile.id === selectedTile)
+                    ?.borderRadius || 0}
+                </span>
+              </label>
+              <input
+                type="range"
+                id="borderRadius"
+                min="0"
+                max="50"
+                value={
+                  tiles.find((tile) => tile.id === selectedTile)
+                    ?.borderRadius || 0
+                }
+                onChange={(e) =>
+                  handlePropertyChange(
+                    selectedTile,
+                    "borderRadius",
+                    parseInt(e.target.value)
+                  )
+                }
+                className="w-full"
+              />
             </div>
             <div className="mb-4">
               {/* Font family selector */}
@@ -420,13 +484,13 @@ const BentoGrid = () => {
               <select
                 value={
                   getShadowIntensityKey(
-                    tiles.find((tile) => tile.id === selectedTile)?.boxShadow
-                  ) || "None" // Set default value to "shadow-md" if no matching key is found
+                    tiles.find((tile) => tile.id === selectedTile)?.dropShadow
+                  ) || "none"
                 }
                 onChange={(e) => {
                   handlePropertyChange(
                     selectedTile,
-                    "boxShadow",
+                    "dropShadow",
                     e.target.value
                   )
                 }}
@@ -467,18 +531,15 @@ const BentoGrid = () => {
                 onChange={handleTextColorChange}
               />
             </div>
-            {/* Rest of the sidebar content */}
-            {/* </div> */}
-            {/* Bring to front and Send to back buttons */}
             <div className="flex justify-between gap-2">
               <button
-                className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                className="w-1/2 bg-blue-400 text-white py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-600 hover:scale-105 hover:text-shadow-lg focus:outline-none focus:bg-blue-600"
                 onClick={bringToFront}
               >
                 Bring to Front
               </button>
               <button
-                className="w-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                className="w-1/2 bg-blue-400 text-white py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-600 hover:scale-105 hover:text-shadow-lg focus:outline-none focus:bg-blue-600"
                 onClick={sendToBack}
               >
                 Send to Back
@@ -487,72 +548,67 @@ const BentoGrid = () => {
           </>
         )}
       </div>
+      {/* Properties panel */}
       {/* Grid of tiles */}
 
-      <div
-        ref={gridRef}
-        style={{
-          background: color,
-          width: "calc(100vw - 600px)",
-          height: "75vh",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: "10px",
-          // borderRadius: "12px",
-          padding: "20px",
-          overflow: "auto",
-        }}
-        className="border border-gray-300"
-      >
-        {tiles.map((tile) => (
-          <Rnd
-            bounds={"parent"}
-            key={tile.id}
-            style={{
-              ...style,
-              fontSize: tile.fontSize,
-              fontFamily: tile.fontFamily,
-              textAlign: tile.textAlign,
-              border: selectedTile === tile.id ? "1px solid blue" : "none",
-              boxShadow: tile.boxShadow,
-              alignItems: tile.alignItems,
-              background: tile.backgroundColor,
-              color: tile.color,
-            }}
-            default={{
-              x: 100,
-              y: 100,
-              width: tile.width,
-              height: tile.height,
-            }}
-            onClick={() => handleTileClick(tile.id)}
+      <div className="mr-2 bg-[#F5F6F6] rounded-2xl shadow-blue-300 shadow-2xl w-36 border border-blue-300">
+        <button
+          className={`text-left text-lg pb-2 py-2 rounded-t-2xl px-6 text-md w-full hover:scale-110 transition duration-300 ${
+            backgroundSelected ? "bg-gray-300" : ""
+          }`}
+          onClick={backgroundSelectedFunc}
+          // style={{ borderBottom: "1px solid lightgray" }}
+        >
+          Background
+        </button>
+        <div>
+          {/* Tile buttons */}
+          {tiles.map((tile) => (
+            <div key={tile.id} className="relative">
+              <div className="relative">
+                <button
+                  className={`flex line-clamp-1 text-left pb-2 py-2 px-6 hover:scale-110 text-md w-full hover:bg-blue-200 hover:rounded transition ${
+                    selectedTile === tile.id ? "bg-gray-300" : ""
+                  }`}
+                  onClick={() => handleClick(tile.id)}
+                  style={{
+                    borderBottom: "1px solid #D1D5DB",
+                    borderTop: "1px solid #D1D5DB",
+                    textAlign: "center",
+                  }}
+                >
+                  {tile.title ? (
+                    tile.title.length > 8 ? (
+                      tile.title.slice(0, 8) + "..."
+                    ) : (
+                      tile.title
+                    )
+                  ) : (
+                    <i>No Name</i>
+                  )}
+                </button>
+                {selectedTile === tile.id && (
+                  <button
+                    className="absolute top-1 right-0 mt-1 mr-1 transition-transform duration-300 transform hover:scale-110"
+                    onClick={() => deleteTile(tile.id)}
+                  >
+                    <TiDelete size={25} color="red" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* Add tile button */}
+          <button
+            className="flex items-center justify-center py-2 px-6 text-md w-full hover:rounded transition transform hover:scale-110"
+            onClick={addTitle}
           >
-            <textarea
-              value={tile.title}
-              onChange={(e) => handleTitleChange(tile.id, e)}
-              className="outline-none"
-              style={{
-                border: "none",
-                width: "100%",
-                resize: "none",
-                textAlign: tile.textAlign,
-                ...(tile.color.includes("linear-gradient")
-                  ? {
-                      backgroundImage: tile.color,
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      color: "transparent",
-                    }
-                  : {
-                      color: tile.color,
-                      backgroundColor: "transparent",
-                    }),
-                fontWeight: tile.fontWeight,
-              }}
-            />
-          </Rnd>
-        ))}
+            <span>
+              <IoAddCircleOutline size={25} color="#40C1EF" />
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   )

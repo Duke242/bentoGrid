@@ -13,31 +13,31 @@ export const dynamic = "force-dynamic"
 // See https://shipfa.st/docs/tutorials/private-page
 export default async function Dashboard() {
   try {
-    // const supabase = createServerComponentClient({ cookies })
+    const supabase = createServerComponentClient({ cookies })
 
-    // const {
-    //   data: { session },
-    // } = await supabase.auth.getSession()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-    // const { data: profiles, error } = await supabase
-    //   .from("profiles")
-    //   .select("has_access")
-    //   .eq("id", session.user.id)
+    const { data: profiles, error } = await supabase
+      .from("profiles")
+      .select("has_access")
+      .eq("id", session.user.id)
 
-    // if (error) {
-    //   throw new Error(error.message)
-    // }
+    if (error) {
+      throw new Error(error.message)
+    }
 
-    // const userAccess = profiles[0].has_access
-    // console.log({ userAccess })
-    const userAccess = true
+    const userAccess = profiles[0].has_access
 
     if (userAccess) {
       return (
-        <main className="min-h-screen p-8 pb-0 overscroll-hidden">
-          <ButtonAccount />
-          <header className="mb-6 flex items-center">
-            {/* <ButtonAccount /> */}
+        <main className="min-h-screen pb-0 overscroll-hidden">
+          <header className=" flex items-center mb-4 ml-4 mt-2 pt-0">
+            <div className="absolute">
+              <ButtonAccount />
+            </div>
+            <ButtonAccount />
             <div className="flex items-center gap-2 mx-auto">
               <Image
                 src={logo}
