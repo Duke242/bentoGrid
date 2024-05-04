@@ -49,7 +49,7 @@ const BentoGrid = () => {
     toPng(gridElement, { cacheBust: true })
       .then((dataUrl) => {
         const link = document.createElement("a")
-        link.download = "my-image-name.png"
+        link.download = "bento-grid.png"
         link.href = dataUrl
         link.click()
       })
