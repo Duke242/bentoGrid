@@ -61,7 +61,7 @@ const PrivacyPolicy = () => {
 
 Last Updated: April 6, 2024
 
-Welcome to BentoGrids! Our website, located at https://bentogrids.org, is dedicated to helping you create Bento Grids easily. Your privacy is important to us, and we are committed to protecting your personal information.
+Welcome to BentoGrids! Our website, located at https://bento-grid.com, is dedicated to helping you create Bento Grids easily. Your privacy is important to us, and we are committed to protecting your personal information.
 
 1. **Information We Collect**
    - We collect the following types of information:

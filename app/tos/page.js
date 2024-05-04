@@ -61,7 +61,7 @@ const TOS = () => {
 
 Last Updated: April 6, 2024
 
-Welcome to BentoGrids! By accessing or using our website at https://bentogrids.org, you agree to comply with and be bound by the following terms and conditions of use. Please review these terms carefully before using our services.
+Welcome to BentoGrids! By accessing or using our website at https://bento-grid.com, you agree to comply with and be bound by the following terms and conditions of use. Please review these terms carefully before using our services.
 
 Acceptance of Terms
 
