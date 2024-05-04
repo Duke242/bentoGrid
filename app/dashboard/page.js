@@ -19,7 +19,7 @@ export default async function Dashboard() {
       data: { session },
     } = await supabase.auth.getSession()
 
-    const { data: profiles, error } = await supabase
+    let { data: profiles, error } = await supabase
       .from("profiles")
       .select("has_access")
       .eq("id", session.user.id)
