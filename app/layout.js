@@ -1,10 +1,11 @@
-import { Nunito } from "next/font/google"
+import { Anek_Latin, Nunito } from "next/font/google"
 import PlausibleProvider from "next-plausible"
 import { getSEOTags } from "@/libs/seo"
 import ClientLayout from "@/components/LayoutClient"
 import config from "@/config"
 import "./globals.css"
 import { Suspense } from "react"
+import { Analytics } from "@vercel/analytics/react"
 
 const font = Nunito({ subsets: ["latin"], weight: "400" })
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       )}
       <body>
         {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+        <Analytics />
         <Suspense>
           <ClientLayout>{children}</ClientLayout>
         </Suspense>

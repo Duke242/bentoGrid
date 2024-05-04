@@ -13,6 +13,7 @@
     "@headlessui/react": "^1.7.18",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/supabase-js": "^2.41.1",
+    "@vercel/analytics": "^1.2.2",
     "axios": "^1.6.8",
     "crisp-sdk-web": "^1.0.22",
     "eslint": "8.47.0",
