@@ -24,9 +24,9 @@ const config = {
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
         // description: "Perfect for small projects",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 9,
+        price: 19,
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 29,
+        priceAnchor: 49,
         features: [
           // {
           //   name: "NextJS boilerplate",
