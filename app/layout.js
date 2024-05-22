@@ -1,4 +1,4 @@
-import { Anek_Latin, Nunito } from "next/font/google"
+import { Nunito } from "next/font/google"
 import PlausibleProvider from "next-plausible"
 import { getSEOTags } from "@/libs/seo"
 import ClientLayout from "@/components/LayoutClient"
@@ -21,6 +21,7 @@ export const viewport = {
 export const metadata = getSEOTags()
 
 export default function RootLayout({ children }) {
+  return <p>Under Maintenance</p>
   return (
     <html lang="en" data-theme={config.colors.theme} className={font.className}>
       {config.domainName && (
