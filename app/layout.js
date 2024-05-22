@@ -22,20 +22,20 @@ export const metadata = getSEOTags()
 
 export default function RootLayout({ children }) {
   return <p>Under Maintenance</p>
-  return (
-    <html lang="en" data-theme={config.colors.theme} className={font.className}>
-      {config.domainName && (
-        <head>
-          <PlausibleProvider domain={config.domainName} />
-        </head>
-      )}
-      <body>
-        {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-        <Analytics />
-        <Suspense>
-          <ClientLayout>{children}</ClientLayout>
-        </Suspense>
-      </body>
-    </html>
-  )
+  // return (
+  //   <html lang="en" data-theme={config.colors.theme} className={font.className}>
+  //     {config.domainName && (
+  //       <head>
+  //         <PlausibleProvider domain={config.domainName} />
+  //       </head>
+  //     )}
+  //     <body>
+  //       {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+  //       <Analytics />
+  //       <Suspense>
+  //         <ClientLayout>{children}</ClientLayout>
+  //       </Suspense>
+  //     </body>
+  //   </html>
+  // )
 }
